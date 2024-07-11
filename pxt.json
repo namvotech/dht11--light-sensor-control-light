@@ -1,5 +1,5 @@
 {
-    "name": "DHT11 & Light Sensor Control Light",
+    "name": "NEOPIXEL-DHT11 & Light Sensor Control Light",
     "description": "",
     "dependencies": {
         "core": "*",

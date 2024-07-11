@@ -1,4 +1,5 @@
 let analogValue = 0
+let strip: neopixel.Strip = null
 let light2 = 0
 let airHumi = 0
 let airTemp = 0
@@ -10,6 +11,18 @@ basic.forever(function () {
     I2C_LCD1602.ShowString("Li:" + light2 + "%  ", 0, 1)
     I2C_LCD1602.ShowString("SLi:" + setLight + "  ", 9, 1)
     basic.pause(100)
+})
+basic.forever(function () {
+    if (light2 < setLight) {
+        basic.showIcon(IconNames.Asleep)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+        strip = neopixel.create(DigitalPin.P15, 8, NeoPixelMode.RGB)
+        strip.showColor(neopixel.colors(NeoPixelColors.White))
+    } else {
+        basic.showIcon(IconNames.Happy)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+        strip.clear()
+    }
 })
 basic.forever(function () {
     airTemp = Environment.dht11value(Environment.DHT11Type.DHT11_temperature_C, DigitalPin.P2)
@@ -64,13 +77,4 @@ basic.forever(function () {
     0
     ))
     basic.pause(100)
-})
-basic.forever(function () {
-    if (light2 < setLight) {
-        basic.showIcon(IconNames.Asleep)
-        pins.digitalWritePin(DigitalPin.P14, 1)
-    } else {
-        basic.showIcon(IconNames.Happy)
-        pins.digitalWritePin(DigitalPin.P14, 0)
-    }
 })
