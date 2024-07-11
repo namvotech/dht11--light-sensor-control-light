@@ -2,17 +2,53 @@ let analogValue = 0
 let light2 = 0
 let airHumi = 0
 let airTemp = 0
+let setLight = EEPROM.readw(100)
 I2C_LCD1602.LcdInit(39)
 basic.forever(function () {
+    I2C_LCD1602.ShowString("Te:" + Math.round(airTemp) + "C  ", 0, 0)
+    I2C_LCD1602.ShowString("Hu:" + airHumi + "%  ", 9, 0)
+    I2C_LCD1602.ShowString("Li:" + light2 + "%  ", 0, 1)
+    I2C_LCD1602.ShowString("SLi:" + setLight + "  ", 9, 1)
+    basic.pause(100)
+})
+basic.forever(function () {
     airTemp = Environment.dht11value(Environment.DHT11Type.DHT11_temperature_C, DigitalPin.P2)
+    basic.pause(100)
     airHumi = Environment.dht11value(Environment.DHT11Type.DHT11_humidity, DigitalPin.P2)
     basic.pause(100)
 })
 basic.forever(function () {
-    I2C_LCD1602.ShowString("T " + airTemp, 0, 0)
-    I2C_LCD1602.ShowString("H " + airHumi, 9, 0)
-    I2C_LCD1602.ShowString("L " + light2 + "   ", 0, 1)
-    basic.pause(100)
+    if (input.buttonIsPressed(Button.A)) {
+        setLight += -1
+        if (setLight < 0) {
+            setLight = 100
+        }
+        basic.showLeds(`
+            . . . . .
+            . . . . .
+            . # # # .
+            . . . . .
+            . . . . .
+            `)
+    } else if (input.buttonIsPressed(Button.B)) {
+        setLight += 1
+        if (setLight > 100) {
+            setLight = 0
+        }
+        basic.showLeds(`
+            . . . . .
+            . . # . .
+            . # # # .
+            . . # . .
+            . . . . .
+            `)
+    } else if (input.logoIsPressed()) {
+        while (input.logoIsPressed()) {
+            basic.showIcon(IconNames.Yes)
+        }
+        EEPROM.writew(100, setLight)
+        basic.pause(2000)
+    }
 })
 basic.forever(function () {
     analogValue = 0
@@ -27,5 +63,14 @@ basic.forever(function () {
     100,
     0
     ))
-    basic.pause(500)
+    basic.pause(100)
+})
+basic.forever(function () {
+    if (light2 < setLight) {
+        basic.showIcon(IconNames.Sad)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+    } else {
+        basic.showIcon(IconNames.Happy)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+    }
 })
