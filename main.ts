@@ -5,7 +5,7 @@ let airTemp = 0
 let setLight = EEPROM.readw(100)
 I2C_LCD1602.LcdInit(39)
 basic.forever(function () {
-    I2C_LCD1602.ShowString("Te:" + Math.round(airTemp) + "C  ", 0, 0)
+    I2C_LCD1602.ShowString("Te:" + Math.trunc(airTemp) + "C ", 0, 0)
     I2C_LCD1602.ShowString("Hu:" + airHumi + "%  ", 9, 0)
     I2C_LCD1602.ShowString("Li:" + light2 + "%  ", 0, 1)
     I2C_LCD1602.ShowString("SLi:" + setLight + "  ", 9, 1)
@@ -47,7 +47,7 @@ basic.forever(function () {
             basic.showIcon(IconNames.Yes)
         }
         EEPROM.writew(100, setLight)
-        basic.pause(2000)
+        music.play(music.tonePlayable(880, music.beat(BeatFraction.Quarter)), music.PlaybackMode.UntilDone)
     }
 })
 basic.forever(function () {
@@ -67,7 +67,7 @@ basic.forever(function () {
 })
 basic.forever(function () {
     if (light2 < setLight) {
-        basic.showIcon(IconNames.Sad)
+        basic.showIcon(IconNames.Asleep)
         pins.digitalWritePin(DigitalPin.P14, 1)
     } else {
         basic.showIcon(IconNames.Happy)
